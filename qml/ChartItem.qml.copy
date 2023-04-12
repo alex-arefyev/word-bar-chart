@@ -1,0 +1,90 @@
+import QtQuick 2.11
+import QtQuick.Window 2.11
+import QtQuick.Controls 1.4
+import QtQuick.Layouts 1.1
+import QtGraphicalEffects 1.2
+//import WordBarChart 1.0
+
+// QColor::fromHslF(x/*0.8, 0.95, 0.5)
+
+Item {
+    id: chartItem
+
+    property string name: ""
+    property int rating: 0
+    property int index: 0
+    property real count: 0
+    property real maxCount: 0
+    property color ratingColor: "white"
+
+    property real globalWordRectWidth: 0
+    property real globalRatingRectWidth: 0
+
+    readonly property alias wordRectWidth: wordText.contentWidth
+    readonly property alias ratingRectWidth: ratingText.contentWidth
+
+    // word rect
+    Rectangle {
+        height: parent.height
+        width: globalWordRectWidth //parent.width * 0.2
+        color: Qt.lighter("gray", 1.2)
+        Text {
+            id: wordText
+            anchors.fill: parent
+            anchors.rightMargin: 5
+            text: chartItem.name
+            horizontalAlignment: Text.AlignRight
+            verticalAlignment: Text.AlignVCenter
+            font.bold: true
+        }
+    }
+    // rating item
+    Item {
+        id: ratingItem
+
+        x: globalWordRectWidth
+        height: parent.height
+        width: {
+            if (chartItem.maxCount > 0) {
+                const w = chartItem.width - chartItem.globalWordRectWidth;
+                return w * (chartItem.count / chartItem.maxCount);
+            }
+            return 0;
+        }
+
+        Rectangle {
+            id: ratingBar
+            width: ratingItem.width - chartItem.globalRatingRectWidth
+            height: parent.height
+            color: chartItem.ratingColor
+            //opacity: 0.75
+        }
+        Rectangle {
+            anchors.left: ratingBar.right
+            anchors.right: ratingItem.right
+            height: parent.height
+            color: "white" //Qt.darker("lightgray", 1.1)
+            border.color: chartItem.ratingColor
+            border.width: 1
+
+            Text {
+                id: ratingText
+                anchors.centerIn: parent
+//                anchors.left: ratingBar.right
+//                anchors.leftMargin: 5
+//                height: parent.height
+                text: "" + chartItem.count
+                visible: parent.width > 0
+                horizontalAlignment: Text.AlignLeft
+                verticalAlignment: Text.AlignVCenter
+            }
+        }
+
+
+        Behavior on width {
+            enabled: WordBarChart.animate && WordBarChart.reading
+            NumberAnimation { duration: 234 }
+        }
+    }
+
+}
